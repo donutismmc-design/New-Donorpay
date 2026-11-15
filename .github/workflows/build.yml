@@ -16,14 +16,25 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 9.2.1
-      - run: gradle build
-      - name: Package
+      - name: Build and package
         run: |
+          SETTINGS=$(find . -name settings.gradle -not -path './.git/*' | head -1)
+          if [ -z "$SETTINGS" ]; then
+            echo "No settings.gradle found anywhere. Files in the repository:"
+            find . -not -path './.git/*' | head -60
+            exit 1
+          fi
+          DIR=$(dirname "$SETTINGS")
+          echo "Building in $DIR"
+          cd "$DIR"
+          gradle build
           JAR=$(ls build/libs/*.jar | grep -v -- '-sources' | head -1)
-          mkdir -p out
-          cp "$JAR" out/donorpay-mod.jar.txt
-          cp "$JAR" out/donorpay-mod.jar
-          cd out && zip donorpay-mod.zip donorpay-mod.jar && rm donorpay-mod.jar
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          cp "$JAR" "$GITHUB_WORKSPACE/out/donorpay-mod.jar.txt"
+          cp "$JAR" "$GITHUB_WORKSPACE/out/donorpay-mod.jar"
+          cd "$GITHUB_WORKSPACE/out"
+          zip donorpay-mod.zip donorpay-mod.jar
+          rm donorpay-mod.jar
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}

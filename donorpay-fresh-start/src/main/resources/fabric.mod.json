@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "donorpay",
+  "version": "${version}",
+  "name": "Donor Pay Alerts",
+  "description": "Shows alerts when you get paid big on Donut SMP.",
+  "environment": "client",
+  "entrypoints": { "client": ["com.donorpay.DonorPayClient"] },
+  "depends": { "fabricloader": ">=0.16.0", "fabric-api": "*" }
+}
